@@ -2,6 +2,7 @@ const axios = require('axios');
 const htmlparser = require("htmlparser2");
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
+const file = require('file-system');
 // const gmailEmail = functions.config().gmail.email;
 // const gmailPassword = functions.config().gmail.password;
 const mailTransport = nodemailer.createTransport({
@@ -11,6 +12,19 @@ const mailTransport = nodemailer.createTransport({
         pass: process.env.PASSWORD
     }
 });
+
+const urlProperties = {
+    protocol:'https://',
+    city: 'vancouver',
+    domain:'craigslist.org',
+    query: 'full+house',
+    max_price: '4000',
+    min_bedrooms: '2',
+    min_bathrooms: '2',
+    availabilityMode: '0',
+    housing_type: [6,9],
+    sale_date: 'all+dates'
+}
 
 const buildUrl = (props) => {
     var s = ''
@@ -34,18 +48,6 @@ const buildUrl = (props) => {
 
 const queryCraigslist = async () => {
   try {
-    const urlProperties = {
-        protocol:'https://',
-        city: 'vancouver',
-        domain:'craigslist.org',
-        query: 'full+house',
-        max_price: '4000',
-        min_bedrooms: '2',
-        min_bathrooms: '2',
-        availabilityMode: '0',
-        housing_type: [6,9],
-        sale_date: 'all+dates'
-    }
     const url = buildUrl(urlProperties);
     console.log('URL = ',url)
     const response = await axios.get(url);
@@ -169,8 +171,15 @@ const queryCraigslist = async () => {
     }, {decodeEntities: true, recognizeSelfClosing: true, xmlMode: true});
     parser.write(response.data);
     parser.end();
-    console.log('Results', results)
-    return results
+    var resultsFiltered = results.filter(value => Object.keys(value).length !== 0);
+    resultsFiltered = resultsFiltered.filter((o, i, self) =>
+      i === self.findIndex((o2) => (
+        o2.linkText === o.linkText
+      ))
+    )
+    console.log('Results parsed')
+    // console.log('Results', results)
+    return resultsFiltered
   } catch (error) {
     console.error(error);
   }
@@ -193,26 +202,38 @@ const queryCraigslist = async () => {
 //     href: The full URL.
 //     origin: The origin of the URL.
 
-//welcome email to specific user
+const readHTMLFile = function(path) {
+    return new Promise((resolve, reject) => {
+        file.readFile(path, { encoding: 'utf-8' }, function(err, html) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(html);
+            }
+        });
+    });
+};
+
 var sendEmail = async (data) =>  {
     try {
-    const mailTransport = config.mailTransport;
-    const mailOptions = {
-        from: `craigslist bot <noreply@gmail.com>`,
-        //testing, email is hardcoded for now to test emails
-        //to: data.supplier.email
-        to: 'ryanjtrann@gmail.com',
-        subject: `craigslistBot TEST`,
-        text: 'Test!!!'
-    }
-    let html = readHTMLFile('./emailTemplates/rss-inlined.html')
-    const template = handlebars.compile(html);
-    const htmlToSend = template(data);
-    mailOptions.html = htmlToSend;
-    await mailTransport.sendMail(
-        mailOptions,
-        console.log('Email sent to:', mailOptions.to)
-    )
+        const mail = mailTransport;
+        const mailOptions = {
+            from: `craigslist bot <noreply@gmail.com>`,
+            //testing, email is hardcoded for now to test emails
+            //to: data.supplier.email
+            to: 'ryanjtrann@gmail.com',
+            subject: `House Hunt Bot`
+        }
+        let html = await readHTMLFile('./emailTemplates/rss-inlined.html')
+        // console.log('sendEmail Html = ', html)
+        const template = handlebars.compile(html);
+        const htmlToSend = template(data);
+        mailOptions.html = htmlToSend;
+        console.log('mailOptions', mailOptions)
+        await mail.sendMail(
+            mailOptions,
+            console.log('Email sent to:', mailOptions.to)
+        )
         return 'Email sent'
     } catch (e){
         console.log(e)
@@ -222,7 +243,14 @@ var sendEmail = async (data) =>  {
 };
 
 exports.craigslistBot = async (event, callback) => {
-    let response = await queryCraigslist()
-    let result = await sendEmail(response)
-    return result
+    try{
+        let response = await queryCraigslist()
+        // console.log('response - ', response)
+        let data = {urlProps: urlProperties, response: response}
+        // console.log('Data - ', data)
+        let result = await sendEmail(data)
+        return result
+    } catch(error){
+        throw new Error(error)
+    }
 };
