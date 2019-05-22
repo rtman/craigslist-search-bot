@@ -19,6 +19,7 @@
     "babel-eslint": "^10.0.1",
     "escape-html": "^1.0.3",
     "eslint": "^5.14.1",
+    "file-system": "^2.2.2",
     "handlebars": "^4.1.0",
     "htmlparser2": "^3.10.1",
     "nodemailer": "^5.1.1",
