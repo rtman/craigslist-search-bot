@@ -2,6 +2,7 @@ const axios = require('axios');
 const htmlparser = require("htmlparser2");
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
+const Buffer = require('safe-buffer').Buffer;
 const file = require('file-system');
 // const gmailEmail = functions.config().gmail.email;
 // const gmailPassword = functions.config().gmail.password;
@@ -13,42 +14,48 @@ const mailTransport = nodemailer.createTransport({
     }
 });
 
-const urlProperties = {
-    protocol:'https://',
-    city: 'vancouver',
-    domain:'craigslist.org',
-    query: 'full+house',
-    max_price: '4000',
-    min_bedrooms: '2',
-    min_bathrooms: '2',
-    availabilityMode: '0',
-    housing_type: [6,9],
-    sale_date: 'all+dates'
-}
+// const urlProperties = {
+//     protocol:'https://',
+//     city: 'vancouver',
+//     area: 'van',
+//     domain:'craigslist.org',
+//     query: 'full+house',
+//     max_price: '4000',
+//     min_bedrooms: '2',
+//     min_bathrooms: '2',
+//     availabilityMode: '0',
+//     housing_type: [6,9],
+//     sale_date: 'all+dates'
+// }
 
-const buildUrl = (props) => {
+const buildUrl = (data) => {
     var s = ''
-    s += props.protocol
-    s += props.city
+    s += 'https://'
+    s += data.city
     s += '.'
-    s += props.domain
-    s += '/search/apa?'
-    if(props.query) s += `query=${props.query}&`
-    if(props.max_price) s += `max_price=${props.max_price}&`
-    if(props.min_bedrooms) s += `min_bedrooms=${props.min_bedrooms}&`
-    if(props.min_bathrooms) s += `min_bathrooms=${props.min_bathrooms}&`
-    if(props.shousing_type) {
-        props.shousing_type.forEach((o) => {
+    // s += data.domain
+    s += 'craigslist.org'
+    if(data.area){
+        s += `/search/${data.area}/apa?`
+    } else {
+        s += '/search/apa?'        
+    }
+    if(data.query) s += `query=${data.query}&`
+    if(data.max_price) s += `max_price=${data.max_price}&`
+    if(data.min_bedrooms) s += `min_bedrooms=${data.min_bedrooms}&`
+    if(data.min_bathrooms) s += `min_bathrooms=${data.min_bathrooms}&`
+    if(data.housing_type) {
+        data.housing_type.forEach((o) => {
             s += `housing_type=${o}&`
         })
     }
-    if(props.sale_date) s += `sale_date=${props.sale_date}`
+    if(data.sale_date) s += `sale_date=${data.sale_date}`
     return s
 }
 
-const queryCraigslist = async () => {
+const queryCraigslist = async (pubSubData) => {
   try {
-    const url = buildUrl(urlProperties);
+    const url = buildUrl(pubSubData);
     console.log('URL = ',url)
     const response = await axios.get(url);
     // console.log('RESPONSE', response);
@@ -216,13 +223,27 @@ const readHTMLFile = function(path) {
 
 var sendEmail = async (data) =>  {
     try {
+        let subject = `House Hunt Bot Results - `
+        switch(data.pubSubData.area){
+            case 'van':
+                subject += 'Vancouver - '
+                data.pubSubData.city = 'Vancouver'
+                break;
+
+            case 'nvn':
+                subject += 'North Van - '
+                data.pubSubData.city = 'North Van'
+                break
+        }
+        let date = new Date()
+        subject += date.toLocaleDateString()
         const mail = mailTransport;
         const mailOptions = {
             from: `craigslist bot <noreply@gmail.com>`,
             //testing, email is hardcoded for now to test emails
             //to: data.supplier.email
-            to: 'test@gmail.com',
-            subject: `House Hunt Bot`
+            to: data.pubSubData.emails,
+            subject: subject
         }
         let html = await readHTMLFile('./emailTemplates/rss-inlined.html')
         // console.log('sendEmail Html = ', html)
@@ -244,11 +265,18 @@ var sendEmail = async (data) =>  {
 
 exports.craigslistBot = async (event, callback) => {
     try{
-        let response = await queryCraigslist()
+        const pubSubData = Buffer.from(event.data, 'base64').toString()
+        console.log('pubSubData - ', pubSubData)
+        let parsedPubSubData = JSON.parse(pubSubData)
+        console.log('parsedPubSubData', parsedPubSubData)
+        // parsedPubSubData.housing_type = JSON.parse(parsedPubSubData.housing_type)
+        // parsedPubSubData.emails = JSON.parse(parsedPubSubData.emails)
+        // console.log('parsedPubSubData parse nested', parsedPubSubData)
+        let response = await queryCraigslist(parsedPubSubData)
         // console.log('response - ', response)
-        let data = {urlProps: urlProperties, response: response}
+        let emailData = {pubSubData: parsedPubSubData, response: response}
         // console.log('Data - ', data)
-        let result = await sendEmail(data)
+        let result = await sendEmail(emailData)
         return result
     } catch(error){
         throw new Error(error)
