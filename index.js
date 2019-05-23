@@ -223,7 +223,7 @@ const readHTMLFile = function(path) {
 
 var sendEmail = async (data) =>  {
     try {
-        let subject = `House Hunt Bot Results - `
+        let subject = ''
         switch(data.pubSubData.area){
             case 'van':
                 subject += 'Vancouver - '
@@ -235,8 +235,10 @@ var sendEmail = async (data) =>  {
                 data.pubSubData.city = 'North Van'
                 break
         }
+        subject += `House Hunt Bot - `
         let date = new Date()
-        subject += date.toLocaleDateString()
+        data.pubSubData.sendDate = date.toLocaleDateString()
+        subject += data.pubSubData.sendDate
         const mail = mailTransport;
         const mailOptions = {
             from: `craigslist bot <noreply@gmail.com>`,
