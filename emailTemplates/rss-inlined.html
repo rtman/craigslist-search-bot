@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>RSS to Email</title>
+    <title>House Hunt Bot Results - {{pubSubData.city}} - {{pubsubData.date}}</title>
     <style media="all" type="text/css">
     @media only screen and (max-width: 620px) {
       .span-2,
@@ -89,8 +89,8 @@
       .img-responsive {
         height: auto !important;
         max-width: 100% !important;
-        /*width: auto !important;*/
-        width: 100% !important;
+        width: auto !important;
+        /*width: 100% !important;*/
       }
       .alert td {
         border-radius: 0 !important;
@@ -156,12 +156,12 @@
   <body style="font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: #f6f6f6; margin: 0; padding: 0;">
     <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: #f6f6f6;" width="100%" bgcolor="#f6f6f6">
       <tr>
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
+<!--         <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td> -->
         <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; Margin: 0 auto !important; max-width: 580px; padding: 10px; width: 580px;" width="580" valign="top">
           <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">This is preheader text. Some clients will show this text as a preview.</span>
+            <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">House Hunt Bot Results - {{pubSubData.city}} - {{pubsubData.date}}</span>
 
             <!-- START HEADER -->
 <!--             <div class="header" style="margin-bottom: 20px; Margin-top: 10px; width: 100%;">
@@ -183,16 +183,15 @@
                   <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                     <tr>
                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">
-                        <h1 class="align-left" style="color: #222222; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; Margin-bottom: 30px; font-size: 35px; text-transform: capitalize; text-align: left;">House Hunt Bot Results for {{timeStamp}}</h1>
+                        <h1 class="align-left" style="color: #222222; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; Margin-bottom: 30px; font-size: 35px; text-transform: capitalize; text-align: left;">House Hunt Bot Results - {{pubSubData.city}} - {{pubsubData.date}}</h1>
                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; Margin: 0; Margin-bottom: 15px;">Search options: 
-                        Query: {{urlProps.query}}
-                        City: {{urlProps.city}}
-                        Max price: {{urlProps.max_price}}
-                        Min Bedrooms: {{urlProps.min_bedrooms}}
-                        Min Bathrooms: {{urlProps.min_bathrooms}}
-                        Availability Mode: {{urlProps.availabilityMode}}
-                        Housing Type: {{urlProps.housing_type}}
-                        Dates: {{urlProps.sale_date}}
+                        Query: {{pubSubData.query}} | 
+                        Max price: {{pubSubData.max_price}} | 
+                        Min Bedrooms: {{pubSubData.min_bedrooms}} | 
+                        Min Bathrooms: {{pubSubData.min_bathrooms}} | 
+                        Availability Mode: {{pubSubData.availabilityMode}} | 
+                        Housing Type: {{pubSubData.housing_type}} | 
+                        Dates: {{pubSubData.sale_date}}
                       </p>
                         {{#each response}}
                         <table border="0" cellpadding="0" cellspacing="0" class="hr" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
@@ -211,10 +210,10 @@
                         <table border="0" cellpadding="0" cellspacing="0" class="article" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                           <tr class="resultRow">
                             <td class="img-responsive" style="font-family: sans-serif; vertical-align: top; font-size: 16px; font-weight: 600; line-height: 1.4em; padding-bottom: 5px;" valign="top">
-                              <a href="{{url}}" target="_blank"><img src="{{imageUrl}}" width="200" height="200" align="center" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%;"></a>
+                              <a href="{{url}}" target="_blank"><img src="{{imageUrl}}" align="center" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%;"></a>
                             </td>
                            <td class="article-content" style="font-family: sans-serif; font-size: 14px; vertical-align: top; font-weight: normal; padding-bottom: 5px;" valign="top">
-                              <a href="https://vancouver.craigslist.org/nvn/apa/d/west-vancouver-full-house-3-bedrooms-2/6894378172.html" target="_blank" class="text-link" style="font-size: 16px; font-weight: 600; line-height: 1.4em; color: #3498db !important; text-decoration: underline !important;">{{linkText}}</a>
+                              <a href="{{url}}" target="_blank" class="text-link" style="font-size: 16px; font-weight: 600; line-height: 1.4em; color: #3498db !important; text-decoration: underline !important;">{{linkText}}</a>
                               <div>
                                 Date: {{#if date}}{{date}}{{/if}}
                               </div>
