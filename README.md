@@ -1,4 +1,4 @@
-# craigstlist-search-bot
+# craigslist-search-bot
 
 This is a craigslist search bot powered by google cloud. Currently it is set to search housing.
 
