@@ -1,6 +1,6 @@
 # craigslist-search-bot
 
-This is a craigslist search bot powered by google cloud. Currently it is set to search housing.
+This is a craigslist search bot powered by google cloud. It is designed to query craigslist and send an email with the content on a regular timing. Currently it is set to search housing.
 
 It's components are:
 
