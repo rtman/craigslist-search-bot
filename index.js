@@ -4,8 +4,6 @@ const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const Buffer = require('safe-buffer').Buffer;
 const file = require('file-system');
-// const gmailEmail = functions.config().gmail.email;
-// const gmailPassword = functions.config().gmail.password;
 const mailTransport = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -242,8 +240,6 @@ var sendEmail = async (data) =>  {
         const mail = mailTransport;
         const mailOptions = {
             from: `craigslist bot <noreply@gmail.com>`,
-            //testing, email is hardcoded for now to test emails
-            //to: data.supplier.email
             to: data.pubSubData.emails,
             subject: subject
         }
@@ -271,8 +267,6 @@ exports.craigslistBot = async (event, callback) => {
         console.log('pubSubData - ', pubSubData)
         let parsedPubSubData = JSON.parse(pubSubData)
         console.log('parsedPubSubData', parsedPubSubData)
-        // parsedPubSubData.housing_type = JSON.parse(parsedPubSubData.housing_type)
-        // parsedPubSubData.emails = JSON.parse(parsedPubSubData.emails)
         // console.log('parsedPubSubData parse nested', parsedPubSubData)
         let response = await queryCraigslist(parsedPubSubData)
         // console.log('response - ', response)
