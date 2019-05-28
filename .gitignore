@@ -10,6 +10,8 @@
 .env.test.local
 .env.production.local
 .env.yaml
+*.sublime-workspace
+*.sublime-project
 debug.txt
 
 npm-debug.log*
