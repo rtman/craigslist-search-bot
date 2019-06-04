@@ -38,6 +38,8 @@ const buildUrl = (data) => {
     } else {
         s += '/search/apa?'        
     }
+    if(data.sortByDate) s += `sort=date&`
+    if(data.availabilityMode) s += `availabilityMode=${data.availabilityMode}&`
     if(data.query) s += `query=${data.query}&`
     if(data.max_price) s += `max_price=${data.max_price}&`
     if(data.min_bedrooms) s += `min_bedrooms=${data.min_bedrooms}&`
@@ -222,18 +224,18 @@ const readHTMLFile = function(path) {
 var sendEmail = async (data) =>  {
     try {
         let subject = ''
-        switch(data.pubSubData.area){
-            case 'van':
-                subject += 'Vancouver - '
-                data.pubSubData.city = 'Vancouver'
-                break;
+        // switch(data.pubSubData.area){
+        //     case 'van':
+        //         subject += 'Vancouver - '
+        //         data.pubSubData.city = 'Vancouver'
+        //         break;
 
-            case 'nvn':
-                subject += 'North Van - '
-                data.pubSubData.city = 'North Van'
-                break
-        }
-        subject += `House Hunt Bot - `
+        //     case 'nvn':
+        //         subject += 'North Van - '
+        //         data.pubSubData.city = 'North Van'
+        //         break
+        // }
+        subject += `${data.pubSubData.type} - House Hunt Bot - `
         let date = new Date()
         data.pubSubData.sendDate = date.toLocaleDateString()
         subject += data.pubSubData.sendDate
@@ -246,6 +248,7 @@ var sendEmail = async (data) =>  {
         let html = await readHTMLFile('./emailTemplates/rss-inlined.html')
         // console.log('sendEmail Html = ', html)
         const template = handlebars.compile(html);
+        data.pubSubData.query = data.pubSubData.query.replace(/%29/g, ')').replace(/%28/g,'(').replace(/%20/g,' ').replace(/%7C/g, '|')
         const htmlToSend = template(data);
         mailOptions.html = htmlToSend;
         console.log('mailOptions', mailOptions)
