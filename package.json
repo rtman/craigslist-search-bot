@@ -23,7 +23,7 @@
     "handlebars": "^4.1.0",
     "htmlparser2": "^3.10.1",
     "nodemailer": "^5.1.1",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "safe-buffer": "^5.1.2"
   },
   "devDependencies": {
