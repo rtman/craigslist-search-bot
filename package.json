@@ -20,7 +20,7 @@
     "escape-html": "^1.0.3",
     "eslint": "^5.14.1",
     "file-system": "^2.2.2",
-    "handlebars": "^4.1.0",
+    "handlebars": "^4.7.7",
     "htmlparser2": "^3.10.1",
     "nodemailer": "^5.1.1",
     "pug": "^2.0.3",
